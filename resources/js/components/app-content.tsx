@@ -1,22 +1,14 @@
-import * as React from 'react';
-import { SidebarInset } from '@/components/ui/sidebar';
-import type { AppVariant } from '@/types';
+import type { ReactNode } from 'react';
+import Box from '@mui/material/Box';
 
-type Props = React.ComponentProps<'main'> & {
-    variant?: AppVariant;
+type Props = {
+    children: ReactNode;
 };
 
-export function AppContent({ variant = 'sidebar', children, ...props }: Props) {
-    if (variant === 'sidebar') {
-        return <SidebarInset {...props}>{children}</SidebarInset>;
-    }
-
+export function AppContent({ children }: Props) {
     return (
-        <main
-            className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 rounded-xl"
-            {...props}
-        >
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
             {children}
-        </main>
+        </Box>
     );
 }

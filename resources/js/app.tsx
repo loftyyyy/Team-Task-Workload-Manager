@@ -1,6 +1,9 @@
 import { createInertiaApp } from '@inertiajs/react';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import draculaTheme from '@/lib/theme';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
@@ -25,10 +28,13 @@ createInertiaApp({
     strictMode: true,
     withApp(app) {
         return (
-            <TooltipProvider delayDuration={0}>
-                {app}
-                <Toaster />
-            </TooltipProvider>
+            <ThemeProvider theme={draculaTheme}>
+                <CssBaseline />
+                <TooltipProvider delayDuration={0}>
+                    {app}
+                    <Toaster />
+                </TooltipProvider>
+            </ThemeProvider>
         );
     },
     progress: {

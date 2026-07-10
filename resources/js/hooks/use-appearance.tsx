@@ -10,7 +10,7 @@ export type UseAppearanceReturn = {
 };
 
 const listeners = new Set<() => void>();
-let currentAppearance: Appearance = 'system';
+let currentAppearance: Appearance = 'dark';
 
 const prefersDark = (): boolean => {
     if (typeof window === 'undefined') {

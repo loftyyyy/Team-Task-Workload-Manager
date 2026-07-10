@@ -8,18 +8,22 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    public function index(Request $request, int $userId)
+    public function index(Request $request)
     {
-        $user = $request->user();
-        $target = $user->can('view all task') ? User::findOrFail($userId) : $user;
-        $tasks = $user->can('view all task') ? Task::all() : $target->tasks;
+        $user = User::findOrFail($request->input('user_id'));
+
+        if ($user->can('view all task')) {
+            $tasks = Task::with('users')->get();
+        } else {
+            $tasks = $user->tasks()->with('users')->get();
+        }
 
         return response()->json($tasks);
     }
 
     public function store(Request $request)
     {
-        $this->authorize('create task');
+        $user = User::findOrFail($request->input('user_id'));
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -28,24 +32,20 @@ class TaskController extends Controller
             'user_ids.*' => 'exists:users,id',
         ]);
 
-        $this->authorize('assign task');
-
         $task = Task::create($validated);
         $task->users()->sync($validated['user_ids']);
 
-        return response()->json($task, 201);
+        return response()->json($task->load('users'), 201);
     }
 
     public function update(Request $request, Task $task)
     {
-        $this->authorize('update', $task);
-
         $validated = $request->validate([
             'status' => 'required|in:pending,in_progress,completed',
         ]);
 
         $task->update($validated);
 
-        return response()->json($task);
+        return response()->json($task->load('users'));
     }
 }
