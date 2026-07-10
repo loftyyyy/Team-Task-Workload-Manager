@@ -192,38 +192,40 @@ export default function MyWork() {
                     </Typography>
                 )}
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
                     {tasks.map((task) => {
                         const action = getNextAction(task);
                         return (
-                            <Card variant="outlined" key={task.id}>
-                                <CardContent>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                                        {task.title}
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-                                        {task.description}
-                                    </Typography>
-                                    <Chip
-                                        label={statusLabel[task.status]}
-                                        size="small"
-                                        color={statusColor[task.status]}
-                                    />
-                                </CardContent>
-                                {action && (
-                                    <CardActions>
-                                        <Button
+                            <Box key={task.id} sx={{ display: 'flex' }}>
+                                <Card variant="outlined" sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+                                    <CardContent sx={{ flex: 1 }}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {task.title}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                            {task.description}
+                                        </Typography>
+                                        <Chip
+                                            label={statusLabel[task.status]}
                                             size="small"
-                                            variant="contained"
-                                            startIcon={action.icon}
-                                            disabled={updatingIds.has(task.id)}
-                                            onClick={() => handleStatusUpdate(task, action.nextStatus)}
-                                        >
-                                            {updatingIds.has(task.id) ? 'Updating...' : action.label}
-                                        </Button>
-                                    </CardActions>
-                                )}
-                            </Card>
+                                            color={statusColor[task.status]}
+                                        />
+                                    </CardContent>
+                                    {action && (
+                                        <CardActions sx={{ mt: 'auto' }}>
+                                            <Button
+                                                size="small"
+                                                variant="contained"
+                                                startIcon={action.icon}
+                                                disabled={updatingIds.has(task.id)}
+                                                onClick={() => handleStatusUpdate(task, action.nextStatus)}
+                                            >
+                                                {updatingIds.has(task.id) ? 'Updating...' : action.label}
+                                            </Button>
+                                        </CardActions>
+                                    )}
+                                </Card>
+                            </Box>
                         );
                     })}
                 </Box>

@@ -138,12 +138,12 @@ export default function TaskDashboard() {
                     All Tasks ({tasks.length})
                 </Typography>
 
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
                     {tasks.map((task) => (
-                        <Box key={task.id} sx={{ width: { xs: '100%', sm: 'calc(50% - 8px)', md: 'calc(33.33% - 11px)' } }}>
-                            <Card variant="outlined" sx={{ height: '100%' }}>
+                        <Box key={task.id} sx={{ display: 'flex' }}>
+                            <Card variant="outlined" sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
                                 <CardContent>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                         {task.title}
                                     </Typography>
                                     <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
