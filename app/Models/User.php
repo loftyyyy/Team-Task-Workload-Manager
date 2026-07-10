@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int $id
@@ -19,24 +20,11 @@ use Illuminate\Notifications\Notifiable;
  */
 #[Fillable([
     'name',
-    'role',
 ])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'role' => Role::class,
-        ];
-    }
+    use HasFactory, Notifiable, HasRoles;
 
     public function tasks()
     {

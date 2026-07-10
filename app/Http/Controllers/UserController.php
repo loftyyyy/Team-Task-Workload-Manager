@@ -10,10 +10,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $query = User::query();
-        $query->where('role', 'employee');
-        $query->paginate(15);
-        $users = $query->get();
+        $users = User::role('employee')->paginate(15);
 
         return response()->json($users);
     }

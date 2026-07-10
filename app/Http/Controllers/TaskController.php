@@ -8,42 +8,40 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    public function index(User $user)
+    public function index(Request $request, int $userId)
     {
-        return response()->json($user->tasks());
+        $user = $request->user();
+        $target = $user->can('view all task') ? User::findOrFail($userId) : $user;
+        $tasks = $user->can('view all task') ? Task::all() : $target->tasks;
+
+        return response()->json($tasks);
     }
 
     public function store(Request $request)
     {
+        $this->authorize('create task');
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'status' => 'sometimes|string|in:pending,in_progress,completed',
             'user_ids' => 'required|array',
             'user_ids.*' => 'exists:users,id',
         ]);
 
-        $task = Task::created([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'status' => $validated['status'] ?? 'pending',
-        ]);
+        $this->authorize('assign task');
 
+        $task = Task::create($validated);
         $task->users()->sync($validated['user_ids']);
 
-        return response()->json([
-            'message' => 'Task created successfully',
-            'task' => $task,
-        ], 201);
-
+        return response()->json($task, 201);
     }
 
     public function update(Request $request, Task $task)
     {
+        $this->authorize('update', $task);
+
         $validated = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'status' => 'sometimes|required|in:pending,in_progress,completed',
+            'status' => 'required|in:pending,in_progress,completed',
         ]);
 
         $task->update($validated);

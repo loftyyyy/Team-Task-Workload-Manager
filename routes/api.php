@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/users', [UserController::class, 'index']);
 
-Route::post('/tasks', []);
+Route::post('/tasks', [TaskController::class, 'store']);
 
 Route::get('my-tasks/{userId}', [TaskController::class, 'index']);
 
-Route::patch('/tasks/{taskId}/status', [TaskController::class, 'update']);
+Route::patch('/tasks/{id}/status', [TaskController::class, 'update']);
