@@ -37,5 +37,8 @@ class RolesAndUsersSeeder extends Seeder
             ->map(fn ($name) => User::create(['name' => $name]));
 
         $employees->each->assignRole($employeeRole);
+
+//        $employee = User::create(['name' => 'Employee User Rho']);
+//        $employee->assignRole($employeeRole);
     }
 }
