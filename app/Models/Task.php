@@ -30,16 +30,12 @@ class Task extends Model
 
     public function getOverallStatusAttribute(): string
     {
-        $statuses = $this->users->pluck('pivot.status')->unique();
+        $freq = $this->users->pluck('pivot.status')->countBy();
+        $max = $freq->max();
 
-        if ($statuses->every(fn ($s) => $s === 'completed')) {
-            return 'completed';
-        }
+        $order = ['completed' => 2, 'in_progress' => 1, 'pending' => 0];
+        $candidates = $freq->filter(fn ($c) => $c === $max)->keys();
 
-        if ($statuses->contains('in_progress') || $statuses->contains('completed')) {
-            return 'in_progress';
-        }
-
-        return 'pending';
+        return $candidates->sort(fn ($a, $b) => $order[$b] <=> $order[$a])->first() ?? 'pending';
     }
 }
