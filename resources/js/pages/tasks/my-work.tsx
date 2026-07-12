@@ -31,11 +31,17 @@ const statusColor: Record<TaskStatus, 'default' | 'primary' | 'success'> = {
     completed: 'success',
 };
 
-function getNextAction(task: Task): { label: string; nextStatus: TaskStatus; icon: React.ReactNode } | null {
-    if (task.status === 'pending') {
+function getCurrentUserPivotStatus(task: Task, userId: number): TaskStatus {
+    const assignee = task.users?.find((u) => u.id === userId);
+    return assignee?.pivot?.status ?? 'pending';
+}
+
+function getNextAction(task: Task, userId: number): { label: string; nextStatus: TaskStatus; icon: React.ReactNode } | null {
+    const status = getCurrentUserPivotStatus(task, userId);
+    if (status === 'pending') {
         return { label: 'Start', nextStatus: 'in_progress', icon: <PlayArrowIcon fontSize="small" /> };
     }
-    if (task.status === 'in_progress') {
+    if (status === 'in_progress') {
         return { label: 'Complete', nextStatus: 'completed', icon: <CheckCircleIcon fontSize="small" /> };
     }
     return null;
@@ -109,7 +115,7 @@ export default function MyWork() {
             const res = await fetch(TaskController.update.url(task.id), {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                body: JSON.stringify({ status: nextStatus }),
+                body: JSON.stringify({ status: nextStatus, user_id: effectiveUserId }),
             });
             if (!res.ok) throw new Error('Update failed');
             const updated: Task = await res.json();
@@ -194,7 +200,8 @@ export default function MyWork() {
 
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
                     {tasks.map((task) => {
-                        const action = getNextAction(task);
+                        const currentStatus = getCurrentUserPivotStatus(task, effectiveUserId);
+                        const action = getNextAction(task, effectiveUserId);
                         return (
                             <Box key={task.id} sx={{ display: 'flex' }}>
                                 <Card variant="outlined" sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -206,9 +213,9 @@ export default function MyWork() {
                                             {task.description}
                                         </Typography>
                                         <Chip
-                                            label={statusLabel[task.status]}
+                                            label={statusLabel[currentStatus]}
                                             size="small"
-                                            color={statusColor[task.status]}
+                                            color={statusColor[currentStatus]}
                                         />
                                     </CardContent>
                                     {action && (

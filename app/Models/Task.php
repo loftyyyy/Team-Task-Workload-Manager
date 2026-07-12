@@ -25,6 +25,21 @@ class Task extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)->withPivot('status');
+    }
+
+    public function getOverallStatusAttribute(): string
+    {
+        $statuses = $this->users->pluck('pivot.status')->unique();
+
+        if ($statuses->every(fn ($s) => $s === 'completed')) {
+            return 'completed';
+        }
+
+        if ($statuses->contains('in_progress') || $statuses->contains('completed')) {
+            return 'in_progress';
+        }
+
+        return 'pending';
     }
 }

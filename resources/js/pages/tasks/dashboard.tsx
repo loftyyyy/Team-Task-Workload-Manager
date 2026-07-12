@@ -18,6 +18,12 @@ import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import SendIcon from '@mui/icons-material/Send';
 
+const statusLabel: Record<TaskStatus, string> = {
+    pending: 'Pending',
+    in_progress: 'In Progress',
+    completed: 'Completed',
+};
+
 const statusColor: Record<TaskStatus, 'default' | 'primary' | 'success'> = {
     pending: 'default',
     in_progress: 'primary',
@@ -150,14 +156,19 @@ export default function TaskDashboard() {
                                         {task.description}
                                     </Typography>
                                     <Chip
-                                        label={(task.status ?? 'pending').replace('_', ' ')}
+                                        label={'Overall: ' + statusLabel[task.overall_status ?? 'pending']}
                                         size="small"
-                                        color={statusColor[task.status ?? 'pending']}
+                                        color={statusColor[task.overall_status ?? 'pending']}
                                         sx={{ mb: 1 }}
                                     />
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                         {task.users?.map((u) => (
-                                            <Chip key={u.id} label={u.name} size="small" variant="outlined" />
+                                            <Chip
+                                                key={u.id}
+                                                label={`${u.name} — ${statusLabel[u.pivot?.status ?? 'pending']}`}
+                                                size="small"
+                                                variant="outlined"
+                                            />
                                         ))}
                                     </Box>
                                 </CardContent>

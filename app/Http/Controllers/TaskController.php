@@ -13,7 +13,9 @@ class TaskController extends Controller
         $user = User::findOrFail($request->input('user_id'));
 
         if ($user->can('view all task')) {
-            $tasks = Task::with('users')->get();
+            $tasks = Task::with('users')->get()->each(function ($task) {
+                $task->overall_status = $task->overall_status;
+            });
         } else {
             $tasks = $user->tasks()->with('users')->get();
         }
@@ -38,13 +40,19 @@ class TaskController extends Controller
         return response()->json($task->load('users'), 201);
     }
 
+    // user_id is passed explicitly here because the assessment brief
+    // mocks authentication via a View-as toggle rather than real session
+    // auth — the endpoint needs to know which user's pivot row to update.
     public function update(Request $request, Task $task)
     {
         $validated = $request->validate([
             'status' => 'required|in:pending,in_progress,completed',
+            'user_id' => 'required|exists:users,id',
         ]);
 
-        $task->update($validated);
+        $task->users()->updateExistingPivot($validated['user_id'], [
+            'status' => $validated['status'],
+        ]);
 
         return response()->json($task->load('users'));
     }
